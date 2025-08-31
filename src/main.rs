@@ -111,7 +111,7 @@ async fn main() {
         .layer(cors)
         .with_state(app_state.clone());
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3001));
+    let addr = SocketAddr::from(([0, 0, 0, 0], 10000));
     let listener = TcpListener::bind(addr).await.unwrap();
     println!("✅ Server running at http://{}", addr);
 
