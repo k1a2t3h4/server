@@ -129,11 +129,7 @@ async fn main() {
   
     let cors = CorsLayer::new()
     .allow_origin([
-        HeaderValue::from_static("http://localhost:3001"),
-        HeaderValue::from_static("http://localhost:3000"),
-        HeaderValue::from_static("http://myapp.local:4321"),
-        HeaderValue::from_static("http://react.myapp.local:4322"),
-        HeaderValue::from_static("http://admin.myapp.local:4323"),
+        HeaderValue::from_static("https://solidjs-zjho.vercel.app")
     ])
     .allow_methods([Method::GET, Method::POST, Method::OPTIONS])
     .allow_headers([
