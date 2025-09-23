@@ -53,7 +53,8 @@ use std::sync::Arc;
 
 async fn connect_aerospike() -> Result<Arc<AerospikeClient>, Box<dyn std::error::Error + Send + Sync>> {
     // Set Aerospike host directly in code
-    let hosts = "switchyard.proxy.rlwy.net:37985".to_string();
+    let hosts = env::var("AERO")
+        .map_err(|_| "Missing environment variable: AERO")?;
     let cpolicy = ClientPolicy::default();
     let client = AerospikeClient::new(&cpolicy, &hosts)
         .map_err(|e| format!("Aerospike connection error: {}", e))?;
