@@ -1,4 +1,5 @@
 use std::time::Instant;
+use aerospike::{as_key, as_bin, Bins, WritePolicy, ReadPolicy, operations,Host};
 use axum::{
     http::{HeaderValue, Method, StatusCode, HeaderMap},
     response::Json,
@@ -146,7 +147,7 @@ async fn main() {
     ])
     .allow_credentials(true);
 
-    use aerospike::{as_key, as_bin, Bins, WritePolicy, ReadPolicy, operations};
+    
     let app = Router::new()
         .route("/api/check", get(check_handler))
         .route("/login", post(login_handler))
