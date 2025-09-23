@@ -1,5 +1,5 @@
 use std::time::Instant;
-use aerospike::{as_key, as_bin, Bins, WritePolicy, ReadPolicy, operations,Host};
+use aerospike::{as_key, as_bin, Bins, WritePolicy, ReadPolicy, operations};
 use axum::{
     http::{HeaderValue, Method, StatusCode, HeaderMap},
     response::Json,
@@ -48,7 +48,7 @@ use jwt::JwtManager;
 const MONGODB_URI: &str = "mongodb+srv://ecommerce:Kathiravan_2004@ecommerce.jc096.mongodb.net/?retryWrites=true&w=majority";
 
 // --- Connect to Aerospike ---
-use aerospike::{Client as AerospikeClient, ClientPolicy};
+use aerospike::{Client as AerospikeClient, ClientPolicy, Host};
 use std::env;
 use std::sync::Arc;
 
@@ -60,16 +60,23 @@ async fn connect_aerospike() -> Result<Arc<AerospikeClient>, Box<dyn std::error:
 
     let cpolicy = ClientPolicy::default();
 
-    // ✅ Parse host:port into Host struct
-    let host = Host::from_string(&hosts)?;
+    // Split "host:port"
+    let mut parts = hosts.split(':');
+    let host_str = parts.next().ok_or("Invalid AERO host")?;
+    let port_str = parts.next().unwrap_or("3000");
+    let port: u16 = port_str.parse().map_err(|_| "Invalid port in AERO")?;
 
-    let client = AerospikeClient::new(&cpolicy, &[host])
+    let host = Host::new(host_str, port);
+
+    // ✅ Wrap in Vec, then pass as &dyn ToHosts
+    let client = AerospikeClient::new(&cpolicy, &vec![host])
         .map_err(|e| format!("Aerospike connection error: {}", e))?;
 
     println!("✅ Connected to Aerospike at {}", hosts);
 
     Ok(Arc::new(client))
 }
+
 
 async fn connect_r2() -> Result<S3Client, Box<dyn std::error::Error + Send + Sync>> {
     let account_id = "065e5715c441540dc89a4218ed83bd75";
@@ -138,7 +145,11 @@ async fn main() {
   
     let cors = CorsLayer::new()
     .allow_origin([
-        HeaderValue::from_static("https://solidjs-zjho.vercel.app")
+        HeaderValue::from_static("http://localhost:3001"),
+        HeaderValue::from_static("http://localhost:3000"),
+        HeaderValue::from_static("http://myapp.local:4321"),
+        HeaderValue::from_static("http://react.myapp.local:4322"),
+        HeaderValue::from_static("http://admin.myapp.local:4323"),
     ])
     .allow_methods([Method::GET, Method::POST, Method::OPTIONS])
     .allow_headers([
@@ -147,7 +158,7 @@ async fn main() {
     ])
     .allow_credentials(true);
 
-    
+
     let app = Router::new()
         .route("/api/check", get(check_handler))
         .route("/login", post(login_handler))
