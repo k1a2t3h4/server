@@ -150,6 +150,7 @@ async fn main() {
         HeaderValue::from_static("http://myapp.local:4321"),
         HeaderValue::from_static("http://react.myapp.local:4322"),
         HeaderValue::from_static("http://admin.myapp.local:4323"),
+        HeaderValue::from_static("https://solidjs-zjho.vercel.app"),
     ])
     .allow_methods([Method::GET, Method::POST, Method::OPTIONS])
     .allow_headers([
@@ -257,7 +258,7 @@ async fn main() {
             "read_val": read_val,
         })))
     }
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3001));
+    let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
     let listener = TcpListener::bind(addr).await.unwrap();
     println!("✅ Server running at http://{}", addr);
 
