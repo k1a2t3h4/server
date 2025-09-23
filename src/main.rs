@@ -52,14 +52,21 @@ use std::env;
 use std::sync::Arc;
 
 async fn connect_aerospike() -> Result<Arc<AerospikeClient>, Box<dyn std::error::Error + Send + Sync>> {
-    // Set Aerospike host directly in code
     let hosts = env::var("AERO")
         .map_err(|_| "Missing environment variable: AERO")?;
-     println!("Aerospike at {}", hosts);
+
+    println!("Aerospike at {}", hosts);
+
     let cpolicy = ClientPolicy::default();
-    let client = AerospikeClient::new(&cpolicy, &hosts)
+
+    // ✅ Parse host:port into Host struct
+    let host = Host::from_string(&hosts)?;
+
+    let client = AerospikeClient::new(&cpolicy, &[host])
         .map_err(|e| format!("Aerospike connection error: {}", e))?;
+
     println!("✅ Connected to Aerospike at {}", hosts);
+
     Ok(Arc::new(client))
 }
 
