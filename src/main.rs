@@ -55,6 +55,7 @@ async fn connect_aerospike() -> Result<Arc<AerospikeClient>, Box<dyn std::error:
     // Set Aerospike host directly in code
     let hosts = env::var("AERO")
         .map_err(|_| "Missing environment variable: AERO")?;
+     println!("Aerospike at {}", hosts);
     let cpolicy = ClientPolicy::default();
     let client = AerospikeClient::new(&cpolicy, &hosts)
         .map_err(|e| format!("Aerospike connection error: {}", e))?;
